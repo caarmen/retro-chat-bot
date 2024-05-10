@@ -53,7 +53,7 @@ class ParticipantBuffers:
             participant_count=len(participants)
         )
         for buffer in self.buffers.values():
-            buffer.resize(max_size=buffer_size)
+            buffer.resize(size=buffer_size)
         for joined_id in participant_change.joined_ids:
             self.buffers[joined_id] = ParticipantBuffer(
                 size=buffer_size,

@@ -34,12 +34,8 @@ class ParticipantBuffer:
         if not self.is_self:
             self._debounce_emit()
 
-    async def resize(self, size: int):
+    def resize(self, size: int):
         self.data.resize(max_size=size)
-        if not self.is_self:
-            if self._task_emit:
-                self._task_emit.cancel()
-            await self._emit()
 
     def _debounce_emit(self):
         if self._task_emit:
