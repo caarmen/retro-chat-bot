@@ -13,7 +13,7 @@ from retrochatbot.framework.domain.usecases.participant_buffer_texts import (
 )
 
 
-class ParticipantBuffers:
+class ParticipantBufferAggregator:
     def __init__(
         self,
         repo: RoomRepository,
@@ -21,55 +21,59 @@ class ParticipantBuffers:
         callback: Callable[[ParticipantTexts], None],
         debounce_s: float,
     ):
-        self.repo = repo
-        self.callback = callback
-        self.buffers: dict[str, ParticipantBuffer] = {}
+        self._repo = repo
+        self._callback = callback
+        self._buffers: dict[str, ParticipantBuffer] = {}
         self._debounce_s = debounce_s
         adapter.subscribe_participants(
-            lambda participants: self.update_participants(participants)
+            lambda participants: self._update_participant_buffers(participants)
         )
         adapter.subscribe_key_typed_events(
-            lambda key_typed_event: self.append(
+            lambda key_typed_event: self._append(
                 key_typed_event.participant_id, key_typed_event.key
             )
         )
         adapter.subscribe_id(lambda id: self._update_id(id))
 
     def _update_id(self, id: str):
-        my_buffer = self.buffers[id]
-        my_buffer.is_self = True
+        self._buffers[id].is_self = True
 
-    def update_participants(
+    def _update_participant_buffers(
         self,
         participants: list[Participant],
     ):
         participant_change: RoomRepository.ParticipantChange = (
-            self.repo.update_participants(participants)
+            self._repo.update_participants(participants)
         )
 
+        # Delete buffers of participants who left
         for left_id in participant_change.left_ids:
-            del self.buffers[left_id]
+            del self._buffers[left_id]
+
+        # Resize buffers of remaining participants
         buffer_size = calculate_participant_buffer_size(
             participant_count=len(participants)
         )
-        for buffer in self.buffers.values():
+        for buffer in self._buffers.values():
             buffer.resize(size=buffer_size)
+
+        # Create buffers for new participants
         for joined_id in participant_change.joined_ids:
-            self.buffers[joined_id] = ParticipantBuffer(
+            self._buffers[joined_id] = ParticipantBuffer(
                 size=buffer_size,
                 debounce_s=self._debounce_s,
-                burst_callback=self.burst_callback,
+                burst_callback=self._burst_callback,
             )
 
-    def append(
+    def _append(
         self,
         participant_id: str,
         key: str,
     ):
-        buffer: ParticipantBuffer = self.buffers.get(participant_id)
+        buffer: ParticipantBuffer = self._buffers.get(participant_id)
         if buffer:
             buffer.append(key)
 
-    async def burst_callback(self):
-        participant_texts = merge_participant_buffer_texts(self.repo, self.buffers)
-        await self.callback(participant_texts)
+    async def _burst_callback(self):
+        participant_texts = merge_participant_buffer_texts(self._repo, self._buffers)
+        await self._callback(participant_texts)

@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class ParticipantBuffer:
+    """
+    Represents the buffer of key events sent by one participant.
+    """
+
     def __init__(
         self,
         size: int,
