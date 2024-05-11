@@ -1,9 +1,9 @@
 import itertools
 
 from retrochatbot.botapi.participant_texts import ParticipantTexts
-from retrochatbot.framework.domain.entities.participant_buffer import ParticipantBuffer
 from retrochatbot.framework.domain.repositories.room_repository import RoomRepository
 from retrochatbot.framework.domain.usecases import keys_to_text
+from retrochatbot.framework.domain.usecases.participant_buffer import ParticipantBuffer
 
 
 def merge_participant_buffer_texts(

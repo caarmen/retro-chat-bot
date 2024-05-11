@@ -3,8 +3,8 @@ from typing import Callable
 from retrochatbot.botapi.participant_texts import ParticipantTexts
 from retrochatbot.framework.domain.adapters.room_adapter import RoomAdapter
 from retrochatbot.framework.domain.entities.participant import Participant
-from retrochatbot.framework.domain.entities.participant_buffer import ParticipantBuffer
 from retrochatbot.framework.domain.repositories.room_repository import RoomRepository
+from retrochatbot.framework.domain.usecases.participant_buffer import ParticipantBuffer
 from retrochatbot.framework.domain.usecases.participant_buffer_size import (
     calculate_participant_buffer_size,
 )
