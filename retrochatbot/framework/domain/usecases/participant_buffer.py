@@ -4,7 +4,10 @@ import logging
 from typing import Callable
 
 from retrochatbot.framework.common.bounded_drop_queue import BoundedDropQueue
-from retrochatbot.framework.domain.usecases.keys_to_text import KEY_BACKSPACE, KEY_ENTER
+from retrochatbot.framework.domain.usecases.buffer_data_to_participant_texts import (
+    KEY_BACKSPACE,
+    KEY_ENTER,
+)
 
 logger = logging.getLogger(__name__)
 

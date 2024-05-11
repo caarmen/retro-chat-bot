@@ -4,13 +4,13 @@ from retrochatbot.botapi.participant_texts import ParticipantTexts
 from retrochatbot.framework.domain.adapters.room_adapter import RoomAdapter
 from retrochatbot.framework.domain.entities.participant import Participant
 from retrochatbot.framework.domain.repositories.room_repository import RoomRepository
-from retrochatbot.framework.domain.usecases.participant_buffer import ParticipantBuffer
-from retrochatbot.framework.domain.usecases.participant_buffer_size import (
+from retrochatbot.framework.domain.usecases.calculate_participant_buffer_size import (
     calculate_participant_buffer_size,
 )
-from retrochatbot.framework.domain.usecases.participant_buffer_texts import (
-    merge_participant_buffer_texts,
+from retrochatbot.framework.domain.usecases.merge_participant_texts import (
+    merge_participant_texts,
 )
+from retrochatbot.framework.domain.usecases.participant_buffer import ParticipantBuffer
 
 
 class ParticipantBufferAggregator:
@@ -75,5 +75,5 @@ class ParticipantBufferAggregator:
             buffer.append(key)
 
     async def _on_participant_stopped_typing(self):
-        participant_texts = merge_participant_buffer_texts(self._repo, self._buffers)
+        participant_texts = merge_participant_texts(self._repo, self._buffers)
         await self._cb_participant_texts_ready(participant_texts)
