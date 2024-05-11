@@ -1,4 +1,6 @@
-from retrochatbot.botapi.participant_texts import ParticipantText, ParticipantTexts
+import itertools
+
+from retrochatbot.botapi.participant_texts import ParticipantTexts
 from retrochatbot.framework.domain.entities.participant_buffer import ParticipantBuffer
 from retrochatbot.framework.domain.repositories.room_repository import RoomRepository
 from retrochatbot.framework.domain.usecases import keys_to_text
@@ -9,17 +11,17 @@ def merge_participant_buffer_texts(
     buffers: dict[str, ParticipantBuffer],
 ) -> ParticipantTexts:
     """
-    :return: a list of participant name to buffer text.
+    :return: the texts of the different participants, ordered by timestamp.
     """
     return sorted(
-        [
-            ParticipantText(
-                participant_name=repo.get_participant_name(participant_id),
-                text=keys_to_text(buffer.data.data),
-                last_event_datetime=buffer.last_event_datetime,
-            )
-            for (participant_id, buffer) in buffers.items()
-            if buffer.last_event_datetime
-        ],
+        itertools.chain(
+            *[
+                keys_to_text(
+                    participant_name=repo.get_participant_name(participant_id),
+                    keys=buffer.data.data,
+                )
+                for (participant_id, buffer) in buffers.items()
+            ]
+        ),
         key=lambda x: x.last_event_datetime,
     )

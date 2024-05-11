@@ -16,7 +16,7 @@ class ParticipantBuffer:
         debounce_s: int,
         burst_callback: Callable[[], None],
     ):
-        self.data: BoundedDropQueue[str] = BoundedDropQueue(max_size=size)
+        self.data: BoundedDropQueue[str | dt.datetime] = BoundedDropQueue(max_size=size)
         self._burst_callback = burst_callback
         self._task_emit: asyncio.Task | None = None
         self._debounce_s = debounce_s
@@ -31,8 +31,7 @@ class ParticipantBuffer:
             return
         self.data.append(item=key)
         self.last_event_datetime = dt.datetime.now(dt.timezone.utc)
-        if not self.is_self:
-            self._debounce_emit()
+        self._debounce_emit()
 
     def resize(self, size: int):
         self.data.resize(max_size=size)
@@ -49,6 +48,8 @@ class ParticipantBuffer:
 
     async def _emit(self):
         try:
-            await self._burst_callback()
+            self.data.append(self.last_event_datetime)
+            if not self.is_self:
+                await self._burst_callback()
         except Exception as e:
             logger.exception("callback raised {e}", exc_info=e)
