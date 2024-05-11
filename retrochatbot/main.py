@@ -44,7 +44,7 @@ async def connect(args: Arguments):
         repo=MemoryRoomRepository(),
         adapter=room_adapter,
         debounce_s=args.debounce_seconds,
-        callback=lambda participant_texts: process_participant_texts(
+        cb_participant_texts_ready=lambda participant_texts: process_participant_texts(
             room_adapter, bot, participant_texts
         ),
     )

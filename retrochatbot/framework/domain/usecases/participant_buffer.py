@@ -18,14 +18,14 @@ class ParticipantBuffer:
         self,
         size: int,
         debounce_s: int,
-        burst_callback: Callable[[], None],
+        cb_participant_stopped_typing: Callable[[], None],
     ):
         self.data: BoundedDropQueue[str | dt.datetime] = BoundedDropQueue(max_size=size)
-        self._burst_callback = burst_callback
+        self.is_bot_participant = False
+        self._cb_participant_stopped_typing = cb_participant_stopped_typing
         self._task_emit: asyncio.Task | None = None
         self._debounce_s = debounce_s
-        self.is_self = False
-        self.last_event_datetime = None
+        self._last_event_datetime = None
 
     def _is_valid_key(self, key: str):
         return key and (len(key) == 1 or key in [KEY_BACKSPACE, KEY_ENTER])
@@ -34,7 +34,7 @@ class ParticipantBuffer:
         if not self._is_valid_key(key):
             return
         self.data.append(item=key)
-        self.last_event_datetime = dt.datetime.now(dt.timezone.utc)
+        self._last_event_datetime = dt.datetime.now(dt.timezone.utc)
         self._debounce_emit()
 
     def resize(self, size: int):
@@ -52,8 +52,8 @@ class ParticipantBuffer:
 
     async def _emit(self):
         try:
-            self.data.append(self.last_event_datetime)
-            if not self.is_self:
-                await self._burst_callback()
+            self.data.append(self._last_event_datetime)
+            if not self.is_bot_participant:
+                await self._cb_participant_stopped_typing()
         except Exception as e:
             logger.exception("callback raised {e}", exc_info=e)
