@@ -5,7 +5,7 @@ on:
       branches:
         - main
 jobs:
-  CheckServer:
+  Check:
     runs-on: ubuntu-latest
     permissions:
       checks: write
