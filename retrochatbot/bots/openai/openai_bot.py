@@ -18,19 +18,12 @@ class OpenAiBot(Bot):
         super().__init__(*args, **kwargs)
         self.client = AsyncOpenAI()
 
-    def _create_system_role_content(self, participant_texts: ParticipantTexts):
+    def _create_system_role_content(self):
         return (
-            "You are in a chat room using technology from the 90s. "
-            "The UI is terminal-based. It is split screen, with one "
-            "portion of the screen for each participant. Participants "
-            "see each other type in real time, letter by letter. "
-            f"There are {len(participant_texts)} participants in the room now. "
-            f"You are one of the participants. Your name is '{self._name}'."
-            "Given the following texts for the different participants, "
-            "you can choose to type something now, or to not type anything for now. "
+            f"Your name is '{self._name}' and you are in a chat room. "
+            "What would you like to say in this chat? "
             f"If you don't think it makes sense to say anything now, reply '{TOKEN_NOTHING}'. "
-            "Otherwise, reply the text you would like to say. "
-            f"In any case, NEVER prefix your messages with <{self._name}> and NEVER include a timestamp."
+            f"NEVER reply with your name '{self._name}'"
         )
 
     async def on_participant_texts(
@@ -38,7 +31,7 @@ class OpenAiBot(Bot):
         participant_texts: ParticipantTexts,
         output_stream: Callable[[str], Awaitable],
     ):
-        system_content = self._create_system_role_content(participant_texts)
+        system_content = self._create_system_role_content()
         logger.debug(f"system content: {system_content}")
         messages = [
             {"role": "system", "content": system_content},
@@ -49,7 +42,8 @@ class OpenAiBot(Bot):
                     "role": (
                         "assistant" if pt.participant_name == self._name else "user"
                     ),
-                    "content": f"{pt.last_event_datetime.strftime('%H:%M:%S')} <{pt.participant_name}> {pt.text}",
+                    "name": pt.participant_name,
+                    "content": pt.text.strip(),
                 }
                 for pt in participant_texts
                 if pt.text.strip()
@@ -63,13 +57,18 @@ class OpenAiBot(Bot):
                 stream=True,
             )
             if stream:
+                did_send_something = False
                 async for chunk in stream:
                     content = chunk.choices[0].delta.content
                     if content:
                         if TOKEN_NOTHING not in content:
                             await output_stream(content)
+                            did_send_something = True
                         else:
                             logger.info("Bot is shy")
+                # Add a trailing space to the full content which was sent.
+                if did_send_something:
+                    await output_stream(" ")
         except Exception as e:
             logger.exception("Error using chatgpt", exc_info=e)
             await output_stream(f"Oops {e}")
