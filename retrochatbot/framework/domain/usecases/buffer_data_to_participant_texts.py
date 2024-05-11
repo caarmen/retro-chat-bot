@@ -6,8 +6,9 @@ KEY_BACKSPACE = "Backspace"
 KEY_ENTER = "Enter"
 
 
-def keys_to_text(
-    participant_name: str, keys: list[str | dt.datetime]
+def buffer_data_to_participant_texts(
+    participant_name: str,
+    keys: list[str | dt.datetime],
 ) -> ParticipantTexts:
     result: ParticipantTexts = []
     cur_text: list[str] = []

@@ -7,9 +7,9 @@ from urllib import parse
 import socketio
 
 from retrochatbot.framework.data.memory_room_repository import MemoryRoomRepository
-from retrochatbot.framework.domain.usecases import load_bot, process_participant_texts
-from retrochatbot.framework.domain.usecases.participant_buffers import (
-    ParticipantBuffers,
+from retrochatbot.framework.domain.usecases import load_bot
+from retrochatbot.framework.domain.usecases.participant_buffer_aggregator import (
+    ParticipantBufferAggregator,
 )
 from retrochatbot.framework.infrastructure.socketio_room_adapter import (
     SocketIoRoomAdapter,
@@ -40,12 +40,12 @@ async def connect(args: Arguments):
         full_bot_class_name=args.bot_class,
         participant_name=args.participant_name,
     )
-    ParticipantBuffers(
+    ParticipantBufferAggregator(
         repo=MemoryRoomRepository(),
         adapter=room_adapter,
         debounce_s=args.debounce_seconds,
-        callback=lambda participant_texts: process_participant_texts(
-            room_adapter, bot, participant_texts
+        cb_participant_texts_ready=lambda participant_texts: bot.on_participant_texts(
+            participant_texts, output_stream=room_adapter.send_text
         ),
     )
 

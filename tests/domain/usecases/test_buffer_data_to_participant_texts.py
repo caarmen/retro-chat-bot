@@ -6,7 +6,7 @@ from retrochatbot.botapi.participant_texts import ParticipantText, ParticipantTe
 from retrochatbot.framework.domain.usecases import (
     KEY_BACKSPACE,
     KEY_ENTER,
-    keys_to_text,
+    buffer_data_to_participant_texts,
 )
 
 DATETIME_PAST_1 = dt.datetime(1996, 1, 1, 11, 55, 0)
@@ -97,12 +97,12 @@ DATETIME_PAST_2 = dt.datetime(1996, 1, 1, 11, 57, 0)
         ],
     ],
 )
-def test_keys_to_text(
+def test_buffer_data_to_participant_texts(
     input_keys: list[str],
     expected_text: ParticipantTexts,
 ):
 
-    actual_text = keys_to_text(
+    actual_text = buffer_data_to_participant_texts(
         participant_name="jdoe",
         keys=input_keys,
     )

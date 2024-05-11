@@ -1,12 +1,12 @@
 import itertools
 
 from retrochatbot.botapi.participant_texts import ParticipantTexts
-from retrochatbot.framework.domain.entities.participant_buffer import ParticipantBuffer
 from retrochatbot.framework.domain.repositories.room_repository import RoomRepository
-from retrochatbot.framework.domain.usecases import keys_to_text
+from retrochatbot.framework.domain.usecases import buffer_data_to_participant_texts
+from retrochatbot.framework.domain.usecases.participant_buffer import ParticipantBuffer
 
 
-def merge_participant_buffer_texts(
+def merge_participant_texts(
     repo: RoomRepository,
     buffers: dict[str, ParticipantBuffer],
 ) -> ParticipantTexts:
@@ -16,7 +16,7 @@ def merge_participant_buffer_texts(
     return sorted(
         itertools.chain(
             *[
-                keys_to_text(
+                buffer_data_to_participant_texts(
                     participant_name=repo.get_participant_name(participant_id),
                     keys=buffer.data.data,
                 )
