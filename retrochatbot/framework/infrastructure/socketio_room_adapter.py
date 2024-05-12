@@ -5,6 +5,7 @@ from socketio import AsyncClientNamespace
 from retrochatbot.framework.domain.adapters.room_adapter import RoomAdapter
 from retrochatbot.framework.domain.entities.key_typed_event import KeyTypedEvent
 from retrochatbot.framework.domain.entities.participant import Participant
+from retrochatbot.framework.domain.entities.special_keys import KEY_ENTER
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,8 @@ class SocketIoRoomAdapter(RoomAdapter, AsyncClientNamespace):
         self,
         text: str,
     ):
-        for key in text:
+        for char in text:
+            key = KEY_ENTER if char in "\r\n" else char
             await self.emit(
                 event="typed",
                 data={

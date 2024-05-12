@@ -1,9 +1,7 @@
 import datetime as dt
 
 from retrochatbot.botapi.participant_texts import ParticipantText, ParticipantTexts
-
-KEY_BACKSPACE = "Backspace"
-KEY_ENTER = "Enter"
+from retrochatbot.framework.domain.entities.special_keys import KEY_BACKSPACE, KEY_ENTER
 
 
 def buffer_data_to_participant_texts(
