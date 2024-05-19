@@ -52,7 +52,7 @@ class OpenAiBot(Bot):
         logger.info(f"{json.dumps(messages, indent=2)}")
         try:
             stream = await self.client.chat.completions.create(
-                model="gpt-4-turbo",
+                model="gpt-4o",
                 messages=messages,
                 stream=True,
             )
