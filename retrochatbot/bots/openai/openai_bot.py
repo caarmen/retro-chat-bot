@@ -23,6 +23,8 @@ class OpenAiBot(Bot):
             "What would you like to say in this chat? "
             f"If you don't think it makes sense to say anything now, reply '{TOKEN_NOTHING}'. "
             f"NEVER reply with your name '{self._name}'"
+            "You're not here to give advice. You're here just to chat, like any "
+            "of the other participants here. Keep the responses short."
         )
 
     async def on_participant_texts(
@@ -51,7 +53,7 @@ class OpenAiBot(Bot):
         logger.info(f"{json.dumps(messages, indent=2)}")
         try:
             stream = await self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-5-nano",
                 messages=messages,
                 stream=True,
             )
