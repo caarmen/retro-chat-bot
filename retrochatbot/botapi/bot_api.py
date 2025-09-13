@@ -5,7 +5,6 @@ from retrochatbot.botapi.participant_texts import ParticipantTexts
 
 
 class Bot(ABC):
-
     def __init__(self, name: str):
         self._name = name
 
