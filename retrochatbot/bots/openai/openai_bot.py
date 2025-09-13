@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAiBot(Bot):
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.client = AsyncOpenAI()

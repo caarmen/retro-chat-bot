@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class OkBot(Bot):
-
     async def on_participant_texts(
         self,
         participant_texts: ParticipantTexts,

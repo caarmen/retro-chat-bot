@@ -3,7 +3,6 @@ from retrochatbot.framework.domain.repositories.room_repository import RoomRepos
 
 
 class MemoryRoomRepository(RoomRepository):
-
     def __init__(self):
         self.participant_id_to_name: dict[str, str] = {}
 

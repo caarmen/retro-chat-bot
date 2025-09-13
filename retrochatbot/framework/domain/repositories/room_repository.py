@@ -5,7 +5,6 @@ from retrochatbot.framework.domain.entities.participant import Participant
 
 
 class RoomRepository(ABC):
-
     @abstractmethod
     def get_participant_name(
         self,
